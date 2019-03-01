@@ -26,7 +26,7 @@ namespace WeaponsNMore
                 .SetName("Hawkeye Combat Computer")
                 .SetDescription("The programmers at Hawkeye HQ have long been attempting to find a way to improve the accuracy of their weapons. They have finally done it. The Combat Computer can effectively control the weapons on a tech and make them lead their target- resulting in a lot less missed shots.")
                 .SetPrice(2000)
-                .SetHP(1000)
+                .SetHP(500)
                 .SetFaction(FactionSubTypes.HE)
                 .SetCategory(BlockCategories.Accessories)
                 .SetModel(GameObjectJSON.MeshFromFile("HE_COMBAT_COMPUTER.obj"), true, GameObjectJSON.GetObjectFromGameResources<Material>("HE_Main"))
@@ -73,10 +73,10 @@ namespace WeaponsNMore
                         if (!(mw == null))
                         {
                             Tank Parent = __instance.GetComponentInParent<Tank>();
-                            if (!(Parent == null) && !(__instance.Target.rbody == null) && Parent.GetComponentInChildren<ModuleVelocityAim>() != null)
+                            if ((!(Parent == null) && !(__instance.Target.rbody == null) && (Singleton.Manager<ManGameMode>.inst.GetCurrentGameType() == ManGameMode.GameType.Attract || Parent.GetComponentInChildren<ModuleVelocityAim>() != null) ))
                             {
                                 Vector3 PredictedTravel = (__instance.Target.rbody.velocity - Parent.rbody.velocity) * (__instance.Target.rbody.transform.position - Parent.rbody.transform.position).magnitude / mw.m_MuzzleVelocity;
-                                Despacito.m_TargetPosition.SetValue(__instance, PredictedTravel * 1.1f + (Vector3)Despacito.m_TargetPosition.GetValue(__instance));
+                                Despacito.m_TargetPosition.SetValue(__instance, PredictedTravel * 0.5f + (Vector3)Despacito.m_TargetPosition.GetValue(__instance));
                             }
                         }
                     }
@@ -86,7 +86,22 @@ namespace WeaponsNMore
                 }
             }
         }
-
+        
+        [HarmonyPatch(typeof(CannonBarrel), "HasClearLineOfFire")]
+        static class Despacito3
+        {
+            private static bool Prefix(ref CannonBarrel __instance, ref bool __result)
+            {
+                
+                Tank Parent = __instance.GetComponentInParent<Tank>();
+                if (!(Parent == null) && (Singleton.Manager<ManGameMode>.inst.GetCurrentGameType() == ManGameMode.GameType.Attract || Parent.GetComponentInChildren<ModuleVelocityAim>() != null))
+                {
+                    __result = true;
+                    return false;
+                }
+                return true;
+            }
+        }
     }
     public class ModuleVelocityAim : Module
     {
