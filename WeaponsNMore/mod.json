@@ -2,7 +2,7 @@
   "Id": "Adds a lot of stuff for killing things",
   "DisplayName": "Weapons N' More",
   "Author": "Mindlessmrawesome",
-  "Version": "1.0.2",
+  "Version": "0.1",
   "Enable": true,
   "AssemblyName": "WeaponsNMore.dll",
   "EntryMethod": "WeaponsNMore.QPatch.Main"
