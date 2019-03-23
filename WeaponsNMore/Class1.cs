@@ -22,10 +22,10 @@ namespace WeaponsNMore
 
                 var HECombatComputer = new BlockPrefabBuilder("GSOLightStud(111)", true)
                     .SetBlockID(730192, "cbea0c11d1655dd4")
-                .SetMass(6)
+                .SetMass(4)
                 .SetName("Hawkeye Combat Computer")
                 .SetDescription("The programmers at Hawkeye HQ have long been attempting to find a way to improve the accuracy of their weapons. They have finally done it. The Combat Computer can effectively control the weapons on a tech and make them lead their target- resulting in a lot less missed shots.")
-                .SetPrice(2000)
+                .SetPrice(10500)
                 .SetHP(500)
                 .SetFaction(FactionSubTypes.HE)
                 .SetCategory(BlockCategories.Accessories)
@@ -57,37 +57,42 @@ namespace WeaponsNMore
 
             private static void Postfix(ref TargetAimer __instance)
             {
-                try
+
+
+                if (__instance.HasTarget)
                 {
-                    if (__instance.HasTarget)
+                    if (Despacito.m_TargetPosition == null)
                     {
+                        Despacito.m_TargetPosition = typeof(TargetAimer).GetField("m_TargetPosition", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                         if (Despacito.m_TargetPosition == null)
                         {
-                            Despacito.m_TargetPosition = typeof(TargetAimer).GetField("m_TargetPosition", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                            if (Despacito.m_TargetPosition == null)
-                            {
-                                Console.WriteLine("FIEL INFOS ARE NULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
-                            }
-                        }
-                        FireData mw = __instance.GetComponentInParent<FireData>();
-                        if (!(mw == null))
-                        {
-                            Tank Parent = __instance.GetComponentInParent<Tank>();
-                            if ((!(Parent == null) && !(__instance.Target.rbody == null) && (Singleton.Manager<ManGameMode>.inst.GetCurrentGameType() == ManGameMode.GameType.Attract || Parent.GetComponentInChildren<ModuleVelocityAim>() != null) ))
-                            {
-                                Vector3 PredictedTravel = (__instance.Target.rbody.velocity - Parent.rbody.velocity) * (__instance.Target.rbody.transform.position - Parent.rbody.transform.position).magnitude / mw.m_MuzzleVelocity;
-                                Despacito.m_TargetPosition.SetValue(__instance, PredictedTravel * 0.5f + (Vector3)Despacito.m_TargetPosition.GetValue(__instance));
-                            }
+                            Console.WriteLine("FIEL INFOS ARE NULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
                         }
                     }
-                }
-                catch
-                {
+                    FireData fireDataThingus = __instance.GetComponentInParent<FireData>();
+                    if (!(fireDataThingus == null))
+
+                    {
+                        Tank Parent = __instance.GetComponentInParent<Tank>();
+                        if ((Singleton.Manager<ManGameMode>.inst.GetCurrentGameType() == ManGameMode.GameType.Attract || Parent.GetComponentInChildren<ModuleVelocityAim>() != null))
+                            if (!(__instance.Target.rbody == null))
+                            {
+                                Vector3 PredictedTravel = (__instance.Target.rbody.velocity - Parent.rbody.velocity) * (__instance.Target.rbody.transform.position - Parent.rbody.transform.position).magnitude / fireDataThingus.m_MuzzleVelocity;
+
+                                if (fireDataThingus.m_BulletPrefab is LaserProjectile)
+                                {
+                                    PredictedTravel *= .6f;
+                                }
+                                Despacito.m_TargetPosition.SetValue(__instance, PredictedTravel * 0.85f + (Vector3)Despacito.m_TargetPosition.GetValue(__instance));
+                            }
+                    }
                 }
             }
+
         }
         
-        [HarmonyPatch(typeof(CannonBarrel), "HasClearLineOfFire")]
+        
+       /* [HarmonyPatch(typeof(CannonBarrel), "HasClearLineOfFire")]
         static class Despacito3
         {
             private static bool Prefix(ref CannonBarrel __instance, ref bool __result)
@@ -101,7 +106,7 @@ namespace WeaponsNMore
                 }
                 return true;
             }
-        }
+        }*/
     }
     public class ModuleVelocityAim : Module
     {
