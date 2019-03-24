@@ -28,6 +28,7 @@ namespace WeaponsNMore
                 .SetPrice(10500)
                 .SetHP(500)
                 .SetFaction(FactionSubTypes.HE)
+                .SetGrade(2)
                 .SetCategory(BlockCategories.Accessories)
                 .SetModel(GameObjectJSON.MeshFromFile("HE_COMBAT_COMPUTER.obj"), true, GameObjectJSON.GetObjectFromGameResources<Material>("HE_Main"))
                 .SetIcon(GameObjectJSON.SpriteFromImage(GameObjectJSON.ImageFromFile("HECombatComputerIcon.png")))
